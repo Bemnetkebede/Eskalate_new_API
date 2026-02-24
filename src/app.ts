@@ -1,18 +1,20 @@
 import express from 'express';
 import cors from 'cors';
-import authRoutes from './modules/auth/auth.routes';
-import articleRoutes from './modules/articles/articles.routes';
-import { startDailyAggregationJob } from './jobs/dailyAggregation.job';
+import authRoutes from './modules/auth/auth.routes.js';
+import articleRoutes from './modules/articles/article.routes.js';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+// Routes
 app.use('/auth', authRoutes);
 app.use('/articles', articleRoutes);
 
-// Start cron jobs
-startDailyAggregationJob();
+// Health check
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok' });
+});
 
 export default app;

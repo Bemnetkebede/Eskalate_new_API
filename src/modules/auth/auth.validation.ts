@@ -1,16 +1,18 @@
 import { z } from 'zod';
+import { Role, Status } from '@prisma/client';
 
 export const signupSchema = z.object({
-    name: z.string().regex(/^[a-zA-Z\s]+$/, 'Name must contain only alphabets and spaces'),
+    name: z.string()
+        .regex(/^[a-zA-Z\s]+$/, 'Name must contain only alphabets and spaces')
+        .min(2, 'Name must be at least 2 characters'),
     email: z.string().email('Invalid email address'),
-    password: z
-        .string()
+    password: z.string()
         .min(8, 'Password must be at least 8 characters long')
         .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
         .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
         .regex(/[0-9]/, 'Password must contain at least one number')
         .regex(/[\W_]/, 'Password must contain at least one special character'),
-    role: z.enum(['USER', 'ADMIN']).optional(),
+    role: z.nativeEnum(Role).optional(),
 });
 
 export const loginSchema = z.object({

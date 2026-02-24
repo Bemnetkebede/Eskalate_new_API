@@ -1,10 +1,10 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import app from './app.js';
+import { env } from './core/config/env.js';
+import { startAnalyticsJob } from './jobs/analytics.job.js';
 
-import app from './app';
+const port = env.PORT;
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.listen(port, () => {
+    console.log(`🚀 News API server running on port ${port}`);
+    startAnalyticsJob();
 });

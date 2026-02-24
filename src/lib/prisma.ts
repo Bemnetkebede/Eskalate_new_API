@@ -2,17 +2,21 @@ import { PrismaClient } from '@prisma/client';
 import { env } from '../core/config/env.js';
 
 const prismaClientSingleton = () => {
-    return new PrismaClient({
-        datasourceUrl: env.DATABASE_URL,
+    return new (PrismaClient as any)({
+        datasources: {
+            db: {
+                url: env.DATABASE_URL,
+            },
+        },
     });
 };
 
-type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>;
+type PrismaClientSingleton = any;
 
 const globalForPrisma = globalThis as unknown as {
-    prisma: PrismaClientSingleton | undefined;
+    prisma: any;
 };
 
-export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
+export const prisma: any = globalForPrisma.prisma ?? prismaClientSingleton();
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;

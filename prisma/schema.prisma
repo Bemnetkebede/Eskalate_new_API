@@ -21,7 +21,7 @@ model User {
   name      String
   email     String    @unique
   password  String
-  role      Role      @default(USER)
+  role      Role      @default(READER)
   articles  Article[]
   readLogs  ReadLog[]
   createdAt DateTime  @default(now())
