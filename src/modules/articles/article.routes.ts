@@ -8,6 +8,7 @@ const router = Router();
 router.get('/', articleController.getAll);
 
 // Authenticated routes (Reader/Author can view, only Author can manage)
+router.get('/me', authenticate, articleController.getMe);
 router.get('/:id', authenticate, articleController.getById);
 
 router.post('/', authenticate, articleController.create);

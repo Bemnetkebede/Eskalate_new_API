@@ -22,13 +22,27 @@ export class ArticleController {
 
     public getAll: RequestHandler = async (req: Request, res: Response): Promise<any> => {
         try {
-            const pageStr = Array.isArray(req.query.page) ? req.query.page[0] : req.query.page;
-            const limitStr = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+            const page = parseInt(String(req.query.page)) || 1;
+            const limit = parseInt(String(req.query.limit)) || 10;
 
-            const page = parseInt(String(pageStr)) || 1;
-            const limit = parseInt(String(limitStr)) || 10;
+            const category = req.query.category as string;
+            const author = req.query.author as string;
+            const q = req.query.q as string;
 
-            const { articles, total } = await articleService.getAll(page, limit);
+            const { articles, total } = await articleService.getAll(page, limit, { category, author, q });
+            return res.status(200).json(ResponseProvider.paginated(articles, total, page, limit));
+        } catch (error: any) {
+            return res.status(400).json(ResponseProvider.error(null, error.message));
+        }
+    };
+
+    public getMe: RequestHandler = async (req: AuthRequest, res: Response): Promise<any> => {
+        try {
+            const page = parseInt(String(req.query.page)) || 1;
+            const limit = parseInt(String(req.query.limit)) || 10;
+            const includeDeleted = req.query.includeDeleted === 'true';
+
+            const { articles, total } = await articleService.getByAuthor(req.user!.id, page, limit, includeDeleted);
             return res.status(200).json(ResponseProvider.paginated(articles, total, page, limit));
         } catch (error: any) {
             return res.status(400).json(ResponseProvider.error(null, error.message));
@@ -37,12 +51,10 @@ export class ArticleController {
 
     public getById: RequestHandler = async (req: AuthRequest, res: Response): Promise<any> => {
         try {
-            const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-            if (!id) throw new Error('Article ID is required');
-
+            const id = req.params.id as string;
             const article = await articleService.getById(id);
 
-            // FIRE AND FORGET (The "Senior" Difference: Story 5)
+            // FIRE AND FORGET
             analyticsEmitter.emit('trackRead', {
                 articleId: id,
                 userId: req.user?.id,
@@ -57,9 +69,7 @@ export class ArticleController {
 
     public update: RequestHandler = async (req: AuthRequest, res: Response): Promise<any> => {
         try {
-            const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-            if (!id) throw new Error('Article ID is required');
-
+            const id = req.params.id as string;
             const validatedData = updateArticleSchema.parse(req.body);
             const article = await articleService.update(id, req.user!.id, validatedData);
             return res.status(200).json(ResponseProvider.success(article, 'Article updated successfully'));
@@ -71,11 +81,21 @@ export class ArticleController {
         }
     };
 
+    public getDashboard: RequestHandler = async (req: AuthRequest, res: Response): Promise<any> => {
+        try {
+            const page = parseInt(String(req.query.page)) || 1;
+            const limit = parseInt(String(req.query.limit)) || 10;
+
+            const { articles, total } = await articleService.getAuthorDashboard(req.user!.id, page, limit);
+            return res.status(200).json(ResponseProvider.paginated(articles, total, page, limit));
+        } catch (error: any) {
+            return res.status(400).json(ResponseProvider.error(null, error.message));
+        }
+    };
+
     public delete: RequestHandler = async (req: AuthRequest, res: Response): Promise<any> => {
         try {
-            const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-            if (!id) throw new Error('Article ID is required');
-
+            const id = req.params.id as string;
             await articleService.delete(id, req.user!.id);
             return res.status(200).json(ResponseProvider.success(null, 'Article deleted successfully'));
         } catch (error: any) {

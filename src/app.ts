@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import authRoutes from './modules/auth/auth.routes.js';
 import articleRoutes from './modules/articles/article.routes.js';
+import authorRoutes from './modules/articles/author.routes.js';
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(express.json());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/articles', articleRoutes);
+app.use('/author', authorRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

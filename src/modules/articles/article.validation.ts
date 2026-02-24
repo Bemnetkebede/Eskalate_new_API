@@ -2,8 +2,9 @@ import { z } from 'zod';
 import { Status } from '@prisma/client';
 
 export const createArticleSchema = z.object({
-    title: z.string().min(5, 'Title must be at least 5 characters'),
-    content: z.string().min(10, 'Content must be at least 10 characters'),
+    title: z.string().min(1, 'Title is required').max(150, 'Title too long'),
+    content: z.string().min(50, 'Content must be at least 50 characters'),
+    category: z.string().optional(),
     status: z.nativeEnum(Status).optional(),
 });
 
