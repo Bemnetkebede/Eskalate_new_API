@@ -4,18 +4,16 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum Role {
-  USER
-  ADMIN
+  AUTHOR
+  READER
 }
 
 enum Status {
   DRAFT
   PUBLISHED
-  ARCHIVED
 }
 
 model User {

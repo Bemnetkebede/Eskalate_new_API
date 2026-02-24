@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { BaseResponse } from '../core/utils/response';
+import type { BaseResponse } from '../core/utils/response.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_news_api_key_2026';
 

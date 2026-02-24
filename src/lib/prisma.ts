@@ -1,7 +1,10 @@
 import { PrismaClient } from '@prisma/client';
+import { env } from '../core/config/env.js';
 
 const prismaClientSingleton = () => {
-    return new PrismaClient();
+    return new PrismaClient({
+        datasourceUrl: env.DATABASE_URL,
+    });
 };
 
 type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>;
